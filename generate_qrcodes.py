@@ -3,10 +3,12 @@ import qrcode
 from PIL import Image, ImageDraw, ImageFont
 import os
 
+# 设置 Excel 文件路径和读取数据
 excel_path = "chargers.xlsx"  # 修改为你的 Excel 文件路径
-sheet_name = "deviceNumber"         # 修改为你的工作表名称
-column_name = "设备编号"          # 修改为包含编号的列名称
+sheet_name = "deviceNumber"   # 修改为你的工作表名称
+column_name = "设备编号"        # 修改为包含编号的列名称
 
+# 读取 Excel 文件
 df = pd.read_excel(excel_path, sheet_name=sheet_name)
 charger_numbers = df[column_name].dropna().tolist()
 
@@ -16,13 +18,10 @@ os.makedirs(save_directory, exist_ok=True)
 
 # 遍历内容生成二维码并保存为 BMP 格式
 for index, charger_code in enumerate(charger_numbers):
-    print(f"二维码已保存到: {charger_code}")
-    
 
     # 提取充电桩编号
     charger_code = f"{charger_code}-1"
     charger_url = f"https://api.shangyucharge.com/1731594137129717760?code={charger_code}"
-    # charger_code = charger_url.split('code=')[-1]
     
     # 生成二维码
     qr = qrcode.QRCode(
@@ -40,11 +39,13 @@ for index, charger_code in enumerate(charger_numbers):
     # 转换图像为RGB模式，方便后续处理
     img = img.convert("RGB")
     
-    # 设置字体（如果系统没有Arial，可以调整为其他系统自带字体）
+    # 设置字体（可以使用粗体字体，例如 arialbd.ttf，如果存在）
     try:
-        font = ImageFont.truetype("arial.ttf", 40)  # 确保字体文件存在
+        font = ImageFont.truetype("arialbd.ttf", 40)  # 尝试使用粗体字体
     except IOError:
-        font = ImageFont.load_default()
+        font = ImageFont.truetype("arial.ttf", 40)  # 退回到常规字体
+        # 或者使用默认字体作为备选
+        # font = ImageFont.load_default()
 
     # 计算文本尺寸
     charger_code = str(charger_code)  # 确保将其转换为字符串
